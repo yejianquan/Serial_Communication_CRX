@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title></title>
+
+    <!-- Bootstrap -->
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css'>
+
+
+
+    <!-- 引入api -->
+		<script src='serial_port.js'></script>
+
+    <script>      
+  //  检测chrome app是否已经安装
+      isExtensionInstalled(
+        function(installed){
+          if(!installed){
+            alert("Serial Port Interface extension is missing. Please install");
+          }
+        }
+      );
+
+      var serialPort = new SerialPort;
+
+//    设置端口名，设置波特率，之后打开端口。
+      function openSelectedPort(){
+        serialPort.setPortName(document.getElementById("portname").value,
+                                function(response){
+                                  if (response.result === "error"){
+                                  console.log(response.error);
+                                  }
+                                });
+        serialPort.setBaudRate(parseInt(document.getElementById("bitrate").value), 
+                                function(response){
+                                  if (response.result === "error"){
+                                  console.log(response.error);
+                                  }
+                                });
+        serialPort.openPort(
+          function(response){
+            console.log(response);
+            if(response.result === "ok"){
+              console.log("open successfully");
+            }
+            else{
+              console.log(response.error);
+            }
+          }
+        );
+      }
+
+//    关闭port
+      function closeCurrentPort(){
+        serialPort.closePort(
+          function(response){
+            console.log(response);
+            if(response.result === "ok"){
+              console.log("close successfully");
+            }
+            else{
+              console.log(response.error);
+            }
+          }
+        );
+      }
+
+//    读取重量的方式，因为是消息传递是异步，所以请在使用时传入一个回调函数，在回调函数的入参里会有重量数据。
+      function readWeight(){
+        serialPort.getWeight(
+          function(response){
+            if (response.result === "error"){
+            console.log(response.error);
+            }else{
+              var result = response.weight;
+              document.getElementById('weight').value = result;
+            }
+          }
+        );
+      }
+
+//    每隔1秒自动读取，若要使用，请在使用结束后停止。
+      function readWeightContinuesly(){
+        this.oInterval = setInterval(readWeight,100);
+        //clearInterval(oInterval);
+      }
+      function stopWeightContinuesly(){
+        clearInterval(this.oInterval);
+      }
+
+//    初始化，如果port已经打开 就关闭port
+      window.onbeforeunload = function(){
+        if(serialPort.isOpen()){
+          serialPort.closePort(
+            function(response){
+              console.log(response);
+              if(response.result === "ok"){
+                return null;
+              }
+              else{
+                alert(response.error);
+                return false;
+              }
+            }
+          );
+        }
+        return null;
+      }
+
+    </script>
+
+  </head>
+
+  <body>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!-- <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js'></script> -->
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <!-- <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script> -->
+
+<!--     Port Name:<br>
+    <input type="text" name= "portname" value="COM3" id="portname">
+    <br><br>
+    Bitrate:<br>
+    <input type="text" name= "bitrate" value="2400" id="bitrate">
+    <br><br>
+    Weight:<br>
+    <input type="text" name= "weight" id="weight">
+    <br><br> -->
+
+
+<!--     <select id='devices'></select>
+    <button onclick='realodDevices()'>Reload</button> -->
+<!--     <button onclick='openSelectedPort()'>Open</button>
+    <button onclick='closeCurrentPort()'>Close</button>
+    <button onclick='readWeight()'>Read</button>
+    <button onclick='readWeightContinuesly()'>Read Continuesly</button> -->
+
+    <font size=6 color=blue style="text-shadow:1px 1px 0px black;">中国邮政 电子秤控件测试程序</font>
+    <font size=2 color=blue>2018.1</font>
+    <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" align=left width="600" color=#987cb9 SIZE=3> 
+    <p></p>
+    <div style = "margin:20px">端口名：<input type="text" id="portname" value="COM3" /></div>
+    <div style = "margin:20px">波特率：<input type="text" id="bitrate" value="2400" /></div>
+    <div style = "margin:20px">重　量：<input type="text" id="weight" style="text-align:right"/><span style="margin:5px">克</span></div>
+    <button id=btn_open onclick="openSelectedPort()">打开端口</button><span>  </span>
+    <button id=btn_open onclick="closeCurrentPort()">关闭端口</button><span>  </span>
+    <button id=btn_get   onclick="readWeight()">称重</button><span>  </span>
+    <button id=btn_start onclick="readWeightContinuesly(this)">自动称重</button>
+    <button id=btn_stop onclick="stopWeightContinuesly(this)">停止自动称重</button>
+    <br>
+
+
+  </body>
+
+</html>
