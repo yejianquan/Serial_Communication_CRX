@@ -2,7 +2,7 @@
 Chrome串口通讯插件
 ## 文件说明
 - EW_CHR_SRI_001.crx : 插件，可直接安装。
-- CHR/example.html : 测试网页，由于插件需要配置可访问IP，目前支持，所以需要用Tomcat部署在本地以后打开
+- CHR/example.html : 测试网页，由于插件需要配置可访问IP，本地测试的话需要用Tomcat部署在本地以后打开
 - CHR/serial_port.js : API文件
 ## 使用说明
 - 安装chrome插件：打开chrome,在地址栏输入chrome://extensions/,将.CRX结尾的插件文件拖入并安装。
